@@ -70,7 +70,7 @@ class GameBoard : GridLayout {
                         this.setAsClicked(GameBoard.currentPlayer)
                         val t = updateBoardRecursive(index)
                         val v = getViewByCoordinates(t)
-
+                        changePlayer()
                         if (v is GameBoard) {
                             getRoot().deactivate()
                             if (v.state != BoardState.Empty)
@@ -161,14 +161,26 @@ class GameBoard : GridLayout {
         for (v in value) {
             if (v == 3) {
                 state = BoardState.Cross
+                setAsWon(state)
                 return true
             }
             else if (v == 21) {
                 state = BoardState.Circle
+                setAsWon(state)
                 return true
             }
         }
         return false
+    }
+
+    private fun setAsWon(state: BoardState) {
+        if (depth == 0) {
+            for (field in fields!!)
+                field.setAsClicked(state)
+        }
+        else
+            for (child in children!!)
+                child.setAsWon(state)
     }
 
     /**
@@ -185,10 +197,12 @@ class GameBoard : GridLayout {
         else if (updateState() && !parent.isRoot()) {
             return parent.updateBoardRecursive(it)
         }
-
-        return coordinates.copy().apply {
-            this[lastIndex] = from
-        }
+        if (!isRoot())
+            return coordinates.copy().apply {
+                this[lastIndex] = from
+            }
+        else
+            return arrayOf()
     }
 
     fun getRoot(): GameBoard {

@@ -23,7 +23,6 @@ class TicTacToeField(context: Context, val parent: GameBoard, val coordinates: A
         else
             setAsCircle()
 
-        GameBoard.changePlayer()
         deactivate()
         isClicked = true
     }
