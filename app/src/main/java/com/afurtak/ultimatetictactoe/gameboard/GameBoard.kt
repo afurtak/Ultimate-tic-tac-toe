@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.GridLayout
+import android.widget.Toast
 
 class GameBoard : GridLayout {
 
@@ -19,35 +20,38 @@ class GameBoard : GridLayout {
     }
 
     val depth: Int
+    val it: Int
     var children: Array<GameBoard>? = null
     var fields: Array<TicTacToeField>? = null
     var parent: GameBoard = this
     var coordinates: Array<Int> = arrayOf()
     var state = BoardState.Empty
 
-    private constructor(context: Context, depth: Int, parent: GameBoard, coordinates: Array<Int>) : super(context) {
+    private constructor(context: Context, depth: Int, parent: GameBoard, coordinates: Array<Int>, it: Int) : super(context) {
         this.coordinates = coordinates
+        this.it = it
         this.depth = depth
         this.parent = parent
         createBoard()
-        println(depth)
     }
 
     constructor(context: Context, depth: Int) : super(context) {
         parent = this
+        it = 0
         this.depth = depth
         createBoard()
-        println(depth)
     }
 
     constructor(context: Context) : this(context, 0)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        it = 0
         this.depth = 0
         createBoard()
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        it = 0
         this.depth = 0
         createBoard()
     }
@@ -59,24 +63,34 @@ class GameBoard : GridLayout {
 
     private fun createBoard() {
         if (depth == 0) {
-            fields = Array(9) {
-                val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(it))).apply {
+            fields = Array(9) { index: Int ->
+                val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(index)), index).apply {
                     addGridLayoutUndefinedSpecLayoutParams()
                     setOnClickListener {
                         this.setAsClicked(GameBoard.currentPlayer)
-                        this@GameBoard.updateBoardRecursive()
+                        val t = updateBoardRecursive(index)
+                        val v = getViewByCoordinates(t)
+
+                        if (v is GameBoard) {
+                            getRoot().deactivate()
+                            if (v.state != BoardState.Empty)
+                                v.parent.activate()
+                            else
+                                v.activate()
+                        }
+
                     }
                 }
                 addView(button)
                 button
             }
         } else {
-            children = Array(9) {
-                val child = GameBoard(context, depth - 1, this, coordinates.copyAndAppend(arrayOf(it)))
+            children = Array(9, { index: Int ->
+                val child = GameBoard(context, depth - 1, this, coordinates.copyAndAppend(arrayOf(index)), index)
                 child.addGridLayoutUndefinedSpecLayoutParams()
                 addView(child)
                 child
-            }
+            })
         }
     }
 
@@ -114,18 +128,17 @@ class GameBoard : GridLayout {
         if (state != BoardState.Empty)
             return false
 
-        val fieldsValues: Array<Int>
-        if (depth == 0) {
-            fieldsValues = Array(9) {
+        val fieldsValues = if (depth == 0) {
+            Array(9) {
                 when (fields!![it].state) {
                     BoardState.Cross -> 1
-                    BoardState.Circle -> 17
+                    BoardState.Circle -> 7
                     else -> 0
                 }
             }
         }
         else {
-            fieldsValues = Array(9) {
+            Array(9) {
                 when (children!![it].state) {
                     BoardState.Cross -> 1
                     BoardState.Circle -> 7
@@ -161,14 +174,21 @@ class GameBoard : GridLayout {
     /**
      * Updates board recursive up to the root.
      * If state changes in root, will call endOfTheGame method which should finish game.
+     *
+     * @return coordinates of the deepest board where state is empty or is not root
      */
-    fun updateBoardRecursive() {
+    fun updateBoardRecursive(from: Int): Array<Int> {
         if (isRoot()) {
             if (updateState())
                 endOfTheGame()
         }
-        else if (updateState())
-            parent.updateState()
+        else if (updateState() && !parent.isRoot()) {
+            return parent.updateBoardRecursive(it)
+        }
+
+        return coordinates.copy().apply {
+            this[lastIndex] = from
+        }
     }
 
     fun getRoot(): GameBoard {
@@ -186,15 +206,22 @@ class GameBoard : GridLayout {
         if (currentCoordinate == 0 && !isRoot())
             return getRoot().getViewByCoordinates(coordinates)
 
+        if (currentCoordinate >= coordinates.size)
+            return this
+
         return if (depth == 0)
             fields!![coordinates[currentCoordinate]]
-        else
-            children!![coordinates[currentCoordinate + 1]]
-                    .getViewByCoordinates(coordinates, currentCoordinate + 1)
+        else {
+            if (currentCoordinate == coordinates.size - 1)
+                children!![coordinates.last()]
+            else
+                children!![coordinates[currentCoordinate]]
+                        .getViewByCoordinates(coordinates, currentCoordinate + 1)
+        }
     }
 
     fun endOfTheGame() {
-
+        Toast.makeText(context, "END OF THE GAME", Toast.LENGTH_LONG).show()
     }
 }
 
