@@ -64,6 +64,7 @@ class GameBoard : GridLayout {
                     addGridLayoutUndefinedSpecLayoutParams()
                     setOnClickListener {
                         this.setAsClicked(GameBoard.currentPlayer)
+                        this@GameBoard.updateBoardRecursive()
                     }
                 }
                 addView(button)
@@ -103,6 +104,73 @@ class GameBoard : GridLayout {
         }
     }
 
+    /**
+     * Check if any of players has 3 signs in one row, col or on diagonal,
+     * and if any of them does, change state of board.
+     *
+     * @return false if state of the board was not changed and true otherwise
+     */
+    fun updateState(): Boolean {
+        if (state != BoardState.Empty)
+            return false
+
+        val fieldsValues: Array<Int>
+        if (depth == 0) {
+            fieldsValues = Array(9) {
+                when (fields!![it].state) {
+                    BoardState.Cross -> 1
+                    BoardState.Circle -> 17
+                    else -> 0
+                }
+            }
+        }
+        else {
+            fieldsValues = Array(9) {
+                when (children!![it].state) {
+                    BoardState.Cross -> 1
+                    BoardState.Circle -> 7
+                    else -> 0
+                }
+            }
+        }
+
+        val value = arrayOf(
+                fieldsValues[0] + fieldsValues[1] + fieldsValues[2],
+                fieldsValues[3] + fieldsValues[4] + fieldsValues[5],
+                fieldsValues[6] + fieldsValues[7] + fieldsValues[8],
+                fieldsValues[0] + fieldsValues[3] + fieldsValues[6],
+                fieldsValues[1] + fieldsValues[4] + fieldsValues[7],
+                fieldsValues[2] + fieldsValues[5] + fieldsValues[8],
+                fieldsValues[0] + fieldsValues[4] + fieldsValues[8],
+                fieldsValues[2] + fieldsValues[4] + fieldsValues[6]
+        )
+
+        for (v in value) {
+            if (v == 3) {
+                state = BoardState.Cross
+                return true
+            }
+            else if (v == 21) {
+                state = BoardState.Circle
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * Updates board recursive up to the root.
+     * If state changes in root, will call endOfTheGame method which should finish game.
+     */
+    fun updateBoardRecursive() {
+        if (isRoot()) {
+            if (updateState())
+                endOfTheGame()
+        }
+        else if (updateState())
+            parent.updateState()
+    }
+
     fun getRoot(): GameBoard {
         return if (parent.depth == this.depth)
             this
@@ -123,6 +191,10 @@ class GameBoard : GridLayout {
         else
             children!![coordinates[currentCoordinate + 1]]
                     .getViewByCoordinates(coordinates, currentCoordinate + 1)
+    }
+
+    fun endOfTheGame() {
+
     }
 }
 
