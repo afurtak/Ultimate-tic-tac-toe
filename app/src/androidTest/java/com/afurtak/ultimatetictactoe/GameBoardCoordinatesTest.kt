@@ -134,10 +134,10 @@ fun GameBoard.getCoordinates(result: ArrayList<Array<Int>> = ArrayList()) {
         }
     }
     else {
-        for (t in childs!!)
+        for (t in children!!)
             result.add(t.coordinates)
 
-        for (t in childs!!)
+        for (t in children!!)
             t.getCoordinates(result)
     }
 }

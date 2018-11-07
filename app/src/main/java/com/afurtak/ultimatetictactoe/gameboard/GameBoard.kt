@@ -8,7 +8,7 @@ import android.widget.GridLayout
 class GameBoard : GridLayout {
 
     val depth: Int
-    var childs: Array<GameBoard>? = null
+    var children: Array<GameBoard>? = null
     var fields: Array<TicTacToeField>? = null
     var parent: GameBoard = this
     var coordinates: Array<Int> = arrayOf()
@@ -54,7 +54,7 @@ class GameBoard : GridLayout {
                 button
             }
         } else {
-            childs = Array(9) {
+            children = Array(9) {
                 val child = GameBoard(context, depth - 1, this, coordinates.copyAndAppend(arrayOf(it)))
                 child.addGridLayoutUndefinedSpecLayoutParams()
                 addView(child)
@@ -64,8 +64,8 @@ class GameBoard : GridLayout {
     }
 
     fun activate() {
-        if (childs != null) {
-            for (child in childs!!)
+        if (children != null) {
+            for (child in children!!)
                 child.activate()
         }
         else {
@@ -76,8 +76,8 @@ class GameBoard : GridLayout {
     }
 
     fun deactivate() {
-        if (childs != null) {
-            for (child in childs!!)
+        if (children != null) {
+            for (child in children!!)
                 child.deactivate()
         }
         else {
@@ -92,6 +92,21 @@ class GameBoard : GridLayout {
             this
         else
             parent.getRoot()
+    }
+
+    fun isRoot(): Boolean {
+        return parent.depth == this.depth
+    }
+
+    fun getViewByCoordinates(coordinates: Array<Int>, currentCoordinate: Int = 0): View {
+        if (currentCoordinate == 0 && !isRoot())
+            return getRoot().getViewByCoordinates(coordinates)
+
+        return if (depth == 0)
+            fields!![coordinates[currentCoordinate]]
+        else
+            children!![coordinates[currentCoordinate + 1]]
+                    .getViewByCoordinates(coordinates, currentCoordinate + 1)
     }
 }
 
