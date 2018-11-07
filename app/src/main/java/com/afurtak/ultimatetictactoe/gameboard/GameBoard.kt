@@ -7,11 +7,23 @@ import android.widget.GridLayout
 
 class GameBoard : GridLayout {
 
+    companion object {
+        var currentPlayer: BoardState = BoardState.Cross
+
+        fun changePlayer() {
+            currentPlayer = if (currentPlayer == BoardState.Cross)
+                BoardState.Circle
+            else
+                BoardState.Cross
+        }
+    }
+
     val depth: Int
     var children: Array<GameBoard>? = null
     var fields: Array<TicTacToeField>? = null
     var parent: GameBoard = this
     var coordinates: Array<Int> = arrayOf()
+    var state = BoardState.Empty
 
     private constructor(context: Context, depth: Int, parent: GameBoard, coordinates: Array<Int>) : super(context) {
         this.coordinates = coordinates
@@ -48,8 +60,12 @@ class GameBoard : GridLayout {
     private fun createBoard() {
         if (depth == 0) {
             fields = Array(9) {
-                val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(it)))
-                button.addGridLayoutUndefinedSpecLayoutParams()
+                val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(it))).apply {
+                    addGridLayoutUndefinedSpecLayoutParams()
+                    setOnClickListener {
+                        this.setAsClicked(GameBoard.currentPlayer)
+                    }
+                }
                 addView(button)
                 button
             }
@@ -120,10 +136,9 @@ fun View.addGridLayoutUndefinedSpecLayoutParams() {
 }
 
 fun Array<Int>.copy(): Array<Int> {
-    val copy = Array(this.size) {
+    return Array(size) {
         this[it]
     }
-    return copy
 }
 
 fun Array<Int>.copyAndAppend(toAppend: Array<Int>) : Array<Int> {
