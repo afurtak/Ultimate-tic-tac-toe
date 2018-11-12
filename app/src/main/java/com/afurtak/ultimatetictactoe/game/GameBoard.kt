@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.GridLayout
 import android.widget.Toast
+import com.afurtak.ultimatetictactoe.R
 
 class GameBoard : GridLayout {
 
@@ -56,6 +57,7 @@ class GameBoard : GridLayout {
     init {
         rowCount = 3
         columnCount = 3
+        setBackgroundResource(R.drawable.plane)
     }
 
     private fun createBoard() {
