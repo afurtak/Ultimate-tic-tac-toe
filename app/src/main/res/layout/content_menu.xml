@@ -18,5 +18,39 @@
         android:text="Start single player game"
         android:id="@+id/startSinglePlayerButton"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/startSinglePlayerButton"
+        android:layout_margin="64dp">
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:padding="16dp"
+            android:text="-"
+            android:id="@+id/decreaseGameDepth"/>
+
+        <TextView
+            android:id="@+id/gameDepthInfo"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="1"/>
+
+        <Button
+            android:id="@+id/increaseGameDepth"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="right"
+            android:padding="16dp"
+            android:text="+"/>
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>

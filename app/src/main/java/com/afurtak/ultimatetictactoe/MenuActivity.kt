@@ -12,6 +12,13 @@ import kotlinx.android.synthetic.main.content_menu.*
 
 class MenuActivity : AppCompatActivity() {
 
+    companion object {
+        const val DEPTH_OF_GAME_KEY = "DEPTH_OF_GAME_KEY_TO_PUT_EXTRA"
+        const val PLAYERS_NUMBER_KEY = "PLAYERS_NUMBER_KEY_TO_PUT_EXTRA"
+    }
+
+    var depthOfGame = 1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
@@ -22,14 +29,33 @@ class MenuActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
 
+        gameDepthInfo.text = depthOfGame.toString()
+
+        increaseGameDepth.setOnClickListener {
+            depthOfGame++
+            if (depthOfGame > 3)
+                depthOfGame = 3
+
+            gameDepthInfo.text = depthOfGame.toString()
+        }
+
+        decreaseGameDepth.setOnClickListener {
+            depthOfGame--
+            if (depthOfGame < 0)
+                depthOfGame = 0
+
+            gameDepthInfo.text = depthOfGame.toString()
+        }
+
         startSinglePlayerButton.setOnClickListener {
-            startGameActivity(1)
+            startGameActivity(1, depthOfGame)
         }
     }
 
-    fun startGameActivity(playersNumber: Int) {
+    fun startGameActivity(playersNumber: Int, depth: Int) {
         val intent = Intent(this, GameActivity::class.java).apply {
-            putExtra("PlayersNumber", playersNumber)
+            putExtra(PLAYERS_NUMBER_KEY, playersNumber)
+            putExtra(DEPTH_OF_GAME_KEY, depth)
         }
         startActivity(intent)
     }

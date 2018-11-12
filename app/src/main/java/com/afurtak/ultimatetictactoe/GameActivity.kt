@@ -9,12 +9,15 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+
+        val depth = intent.getIntExtra(MenuActivity.DEPTH_OF_GAME_KEY, 1)
+
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
 
         val fragment = GameFragment()
         val arguments = Bundle()
-        arguments.putInt(GameFragment.DEPTH_KEY, 1)
+        arguments.putInt(GameFragment.DEPTH_KEY, depth)
         fragment.arguments = arguments
 
         transaction.add(R.id.gameActivityGameLayout, fragment)
