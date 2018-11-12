@@ -8,17 +8,6 @@ import android.widget.Toast
 
 class GameBoard : GridLayout {
 
-    companion object {
-        var currentPlayer: BoardState = BoardState.Cross
-
-        fun changePlayer() {
-            currentPlayer = if (currentPlayer == BoardState.Cross)
-                BoardState.Circle
-            else
-                BoardState.Cross
-        }
-    }
-
     val depth: Int
     val it: Int
     var children: Array<GameBoard>? = null
@@ -26,6 +15,13 @@ class GameBoard : GridLayout {
     var parent: GameBoard = this
     var coordinates: Array<Int> = arrayOf()
     var state = BoardState.Empty
+    var gameManager: GameManager? = null
+    get() {
+        return if (isRoot())
+            field
+        else
+            getRoot().gameManager
+    }
 
     private constructor(context: Context, depth: Int, parent: GameBoard, coordinates: Array<Int>, it: Int) : super(context) {
         this.coordinates = coordinates
@@ -39,6 +35,7 @@ class GameBoard : GridLayout {
         parent = this
         it = 0
         this.depth = depth
+        gameManager = GameManager()
         createBoard()
     }
 
@@ -67,10 +64,10 @@ class GameBoard : GridLayout {
                 val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(index)), index).apply {
                     addGridLayoutUndefinedSpecLayoutParams()
                     setOnClickListener {
-                        this.setAsClicked(GameBoard.currentPlayer)
+                        this.setAsClicked(gameManager!!.currentPlayer)
                         val t = updateBoardRecursive(index)
                         val v = getViewByCoordinates(t)
-                        changePlayer()
+                        gameManager!!.changePlayer()
                         if (v is GameBoard) {
                             getRoot().deactivate()
                             if (v.state != BoardState.Empty)
