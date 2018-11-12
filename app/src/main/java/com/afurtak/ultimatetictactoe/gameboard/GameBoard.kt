@@ -88,7 +88,7 @@ class GameBoard : GridLayout {
             children = Array(9, { index: Int ->
                 val child = GameBoard(context, depth - 1, this, coordinates.copyAndAppend(arrayOf(index)), index)
                 child.addGridLayoutUndefinedSpecLayoutParams()
-                addView(child)
+                this@GameBoard.addView(child)
                 child
             })
         }
@@ -194,9 +194,14 @@ class GameBoard : GridLayout {
             if (updateState())
                 endOfTheGame()
         }
-        else if (updateState() && !parent.isRoot()) {
-            return parent.updateBoardRecursive(it)
+        else if (updateState()) {
+            if (!parent.isRoot())
+                return parent.updateBoardRecursive(it)
+            else if (parent.updateState()) {
+                endOfTheGame()
+            }
         }
+
         if (!isRoot())
             return coordinates.copy().apply {
                 this[lastIndex] = from
