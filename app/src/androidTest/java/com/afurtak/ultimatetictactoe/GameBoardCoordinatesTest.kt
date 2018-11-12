@@ -2,7 +2,7 @@ package com.afurtak.ultimatetictactoe
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import com.afurtak.ultimatetictactoe.gameboard.GameBoard
+import com.afurtak.ultimatetictactoe.game.GameBoard
 
 import org.junit.Test
 import org.junit.runner.RunWith

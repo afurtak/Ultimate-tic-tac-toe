@@ -1,11 +1,11 @@
-package com.afurtak.ultimatetictactoe
+package com.afurtak.ultimatetictactoe.game
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.afurtak.ultimatetictactoe.gameboard.GameBoard
+import com.afurtak.ultimatetictactoe.R
 import kotlinx.android.synthetic.main.game_fragment.view.*
 
 class GameFragment : Fragment() {

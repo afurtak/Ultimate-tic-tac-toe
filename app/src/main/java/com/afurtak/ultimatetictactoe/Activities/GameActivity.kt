@@ -1,7 +1,9 @@
-package com.afurtak.ultimatetictactoe
+package com.afurtak.ultimatetictactoe.Activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.afurtak.ultimatetictactoe.R
+import com.afurtak.ultimatetictactoe.game.GameFragment
 
 class GameActivity : AppCompatActivity() {
 

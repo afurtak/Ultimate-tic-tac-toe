@@ -1,4 +1,4 @@
-package com.afurtak.ultimatetictactoe
+package com.afurtak.ultimatetictactoe.layouts
 
 import android.content.Context
 import android.util.AttributeSet

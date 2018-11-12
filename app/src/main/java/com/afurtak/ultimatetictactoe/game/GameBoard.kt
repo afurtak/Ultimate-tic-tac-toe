@@ -1,4 +1,4 @@
-package com.afurtak.ultimatetictactoe.gameboard
+package com.afurtak.ultimatetictactoe.game
 
 import android.content.Context
 import android.util.AttributeSet
