@@ -65,6 +65,7 @@ class GameBoard : GridLayout {
             fields = Array(9) { index: Int ->
                 val button = TicTacToeField(context, this, coordinates.copyAndAppend(arrayOf(index)), index).apply {
                     addGridLayoutUndefinedSpecLayoutParams()
+                    activate()
                     setOnClickListener {
                         this.setAsClicked(gameManager!!.currentPlayer)
                         val t = updateBoardRecursive(index)
@@ -93,6 +94,9 @@ class GameBoard : GridLayout {
         }
     }
 
+    /**
+     * Activate recursively all children.
+     */
     fun activate() {
         if (children != null) {
             for (child in children!!)
@@ -105,6 +109,9 @@ class GameBoard : GridLayout {
         }
     }
 
+    /**
+     * Deactivate recursively all children.
+     */
     fun deactivate() {
         if (children != null) {
             for (child in children!!)
@@ -172,6 +179,9 @@ class GameBoard : GridLayout {
         return false
     }
 
+    /**
+     * Marks all children-buttons as won
+     */
     private fun setAsWon(state: BoardState) {
         if (depth == 0) {
             for (field in fields!!)
@@ -209,6 +219,9 @@ class GameBoard : GridLayout {
             return arrayOf()
     }
 
+    /**
+     * @return root of the GameBoard instance.
+     */
     fun getRoot(): GameBoard {
         return if (parent.depth == this.depth)
             this
@@ -216,10 +229,21 @@ class GameBoard : GridLayout {
             parent.getRoot()
     }
 
+    /**
+     * @return true if the instance of GameBoard on which was
+     *         called the method isn't child board of any GameBoard.
+     */
     fun isRoot(): Boolean {
         return parent.depth == this.depth
     }
 
+    /**
+     * Recursive method that returns GameBoard or button
+     * from GameBoard having given coordinates.
+     *
+     * @return View class instance which should be casted
+     *         to GameBoard, or TicTacToeField.
+     */
     fun getViewByCoordinates(coordinates: Array<Int>, currentCoordinate: Int = 0): View {
         if (currentCoordinate == 0 && !isRoot())
             return getRoot().getViewByCoordinates(coordinates)
