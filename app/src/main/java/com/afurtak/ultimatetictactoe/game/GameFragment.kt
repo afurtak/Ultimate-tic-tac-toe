@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.afurtak.ultimatetictactoe.R
 import kotlinx.android.synthetic.main.game_fragment.view.*
 
@@ -24,10 +25,17 @@ class GameFragment : Fragment() {
         }
         val fragmentView = inflater.inflate(R.layout.game_fragment, container, false)
 
-        val gameBoard = GameBoard(fragmentView.context, depth)
+        val gameManager = GameManager {
+            Toast.makeText(context, "Changing player", Toast.LENGTH_LONG).show()
+        }
+        val gameBoard = GameBoard(fragmentView.context, depth, gameManager)
         gameBoard.layoutParams = ViewGroup.
                 LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        fragmentView.gameFragmentLayout.addView(gameBoard)
+
+        fragmentView.gameBoardLayout.addView(gameBoard)
+        fragmentView.undoButton.setOnClickListener {
+            gameBoard.undo()
+        }
 
         return fragmentView
     }

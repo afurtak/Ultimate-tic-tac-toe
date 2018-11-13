@@ -32,25 +32,13 @@ class GameBoard : GridLayout {
         createBoard()
     }
 
-    constructor(context: Context, depth: Int) : super(context) {
+    constructor(context: Context) : this(context, 0, GameManager())
+
+    constructor(context: Context, depth: Int, gameManager: GameManager) : super(context) {
         parent = this
         it = 0
         this.depth = depth
-        gameManager = GameManager()
-        createBoard()
-    }
-
-    constructor(context: Context) : this(context, 0)
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        it = 0
-        this.depth = 0
-        createBoard()
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        it = 0
-        this.depth = 0
+        this.gameManager = gameManager
         createBoard()
     }
 
@@ -264,6 +252,10 @@ class GameBoard : GridLayout {
 
     fun endOfTheGame() {
         Toast.makeText(context, "END OF THE GAME", Toast.LENGTH_LONG).show()
+    }
+
+    fun undo() {
+
     }
 }
 

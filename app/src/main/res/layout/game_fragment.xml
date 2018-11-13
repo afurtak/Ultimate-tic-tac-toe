@@ -1,7 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.afurtak.ultimatetictactoe.layouts.SquareFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/gameFragmentLayout">
+    android:id="@+id/gameFragmentLayout"
+    android:orientation="vertical">
 
-</com.afurtak.ultimatetictactoe.layouts.SquareFrameLayout>
+    <com.afurtak.ultimatetictactoe.layouts.SquareFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gameBoardLayout">
+
+    </com.afurtak.ultimatetictactoe.layouts.SquareFrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:text="UNDO"
+            android:id="@+id/undoButton"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="now turn: " />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:scaleType="fitStart"
+            android:id="@+id/currentTurnImage"/>
+    </LinearLayout>
+
+</LinearLayout>
