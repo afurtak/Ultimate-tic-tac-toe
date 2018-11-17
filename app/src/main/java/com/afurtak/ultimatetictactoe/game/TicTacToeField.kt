@@ -17,7 +17,9 @@ class TicTacToeField(context: Context, val parent: GameBoard, val coordinates: A
     private constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : this(context, GameBoard(context), arrayOf(), 0)
 
     var isClicked = false
-    var state = BoardState.Empty
+    var isWon = false
+    var clickedState = BoardState.Empty
+    var wonState = BoardState.Empty
 
     init {
 
@@ -33,14 +35,41 @@ class TicTacToeField(context: Context, val parent: GameBoard, val coordinates: A
         isClicked = true
     }
 
+    fun setAsNotClicked() {
+        clickedState = BoardState.Empty
+        text = ""
+        isClicked = false
+    }
+
+    fun setAsWon(state: BoardState) {
+        wonState = state
+        text = if (state == BoardState.Cross)
+            "X"
+        else
+            "O"
+        isWon = true
+    }
+
+    fun undoSetAsWon() {
+        isWon = false
+        wonState = BoardState.Empty
+        text = if (!isClicked)
+            ""
+        else
+            if (clickedState == BoardState.Cross)
+                "X"
+            else
+                "O"
+    }
+
     private fun setAsCircle() {
         text = "O"
-        state = BoardState.Circle
+        clickedState = BoardState.Circle
     }
 
     private fun setAsCross() {
         text = "X"
-        state = BoardState.Cross
+        clickedState = BoardState.Cross
     }
 
     fun activate() {
@@ -54,7 +83,10 @@ class TicTacToeField(context: Context, val parent: GameBoard, val coordinates: A
         isClickable = false
     }
 
+
+
     fun erase() {
 
     }
+
 }

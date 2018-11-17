@@ -1,7 +1,6 @@
 package com.afurtak.ultimatetictactoe.game
 
 import android.content.Context
-import android.util.AttributeSet
 import android.view.View
 import android.widget.GridLayout
 import android.widget.Toast
@@ -55,18 +54,7 @@ class GameBoard : GridLayout {
                     addGridLayoutUndefinedSpecLayoutParams()
                     activate()
                     setOnClickListener {
-                        this.setAsClicked(gameManager!!.currentPlayer)
-                        val t = updateBoardRecursive(index)
-                        val v = getViewByCoordinates(t)
-                        gameManager!!.changePlayer()
-                        if (v is GameBoard) {
-                            getRoot().deactivate()
-                            if (v.state != BoardState.Empty)
-                                v.parent.activate()
-                            else
-                                v.activate()
-                        }
-
+                        makeMove(index)
                     }
                 }
                 addView(button)
@@ -80,6 +68,21 @@ class GameBoard : GridLayout {
                 child
             })
         }
+    }
+
+    fun TicTacToeField.makeMove(index: Int) {
+        this.setAsClicked(gameManager!!.currentPlayer)
+        val t = updateBoardRecursive(index)
+        val v = getViewByCoordinates(t)
+        gameManager!!.changePlayer()
+        if (v is GameBoard) {
+            getRoot().deactivate()
+            if (v.state != BoardState.Empty)
+                v.parent.activate()
+            else
+                v.activate()
+        }
+        gameManager!!.addToHistory(this.coordinates)
     }
 
     /**
@@ -114,9 +117,9 @@ class GameBoard : GridLayout {
 
     /**
      * Check if any of players has 3 signs in one row, col or on diagonal,
-     * and if any of them does, change state of board.
+     * and if any of them does, change clickedState of board.
      *
-     * @return false if state of the board was not changed and true otherwise
+     * @return true if clickedState of the board was not changed and false otherwise
      */
     fun updateState(): Boolean {
         if (state != BoardState.Empty)
@@ -124,7 +127,7 @@ class GameBoard : GridLayout {
 
         val fieldsValues = if (depth == 0) {
             Array(9) {
-                when (fields!![it].state) {
+                when (fields!![it].clickedState) {
                     BoardState.Cross -> 1
                     BoardState.Circle -> 7
                     else -> 0
@@ -173,7 +176,7 @@ class GameBoard : GridLayout {
     private fun setAsWon(state: BoardState) {
         if (depth == 0) {
             for (field in fields!!)
-                field.setAsClicked(state)
+                field.setAsWon(state)
         }
         else
             for (child in children!!)
@@ -182,9 +185,9 @@ class GameBoard : GridLayout {
 
     /**
      * Updates board recursive up to the root.
-     * If state changes in root, will call endOfTheGame method which should finish game.
+     * If clickedState changes in root, will call endOfTheGame method which should finish game.
      *
-     * @return coordinates of the deepest board where state is empty or is not root
+     * @return coordinates of the deepest board where clickedState is empty or is not root
      */
     fun updateBoardRecursive(from: Int): Array<Int> {
         if (isRoot()) {
@@ -254,8 +257,55 @@ class GameBoard : GridLayout {
         Toast.makeText(context, "END OF THE GAME", Toast.LENGTH_LONG).show()
     }
 
-    fun undo() {
 
+
+    fun undo() {
+        if (gameManager!!.hasHistory()) {
+            val lastMove = getLastMove()
+            var lastField = getViewByCoordinates(lastMove) as TicTacToeField
+            lastField.setAsNotClicked()
+
+            var board = lastField.parent
+            while (!board.isRoot() && board.parent.state != BoardState.Empty)
+                board = board.parent
+
+            board.undoBoardRecursive()
+
+            gameManager!!.changePlayer()
+            gameManager!!.undo()
+
+            if (gameManager!!.hasHistory()) {
+                var coordinates = gameManager!!.getLastCoordinates()
+                lastField = getViewByCoordinates(coordinates) as TicTacToeField
+                coordinates = lastField.parent.updateBoardRecursive(coordinates.last())
+                val v = getViewByCoordinates(coordinates)
+                if (v is GameBoard) {
+                    getRoot().deactivate()
+                    if (v.state != BoardState.Empty)
+                        v.parent.activate()
+                    else
+                        v.activate()
+                }
+            }
+            else {
+                getRoot().activate()
+            }
+        }
+
+    }
+
+    fun undoBoardRecursive() {
+        state = BoardState.Empty
+        if (depth == 0)
+            for (field in fields!!)
+                field.undoSetAsWon()
+        else
+            for (child in children!!)
+                child.undoBoardRecursive()
+    }
+
+    fun getLastMove() : Array<Int> {
+        return gameManager!!.getLastCoordinates()
     }
 }
 
