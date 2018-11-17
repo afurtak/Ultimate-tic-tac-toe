@@ -72,16 +72,10 @@ class GameBoard : GridLayout {
 
     fun TicTacToeField.makeMove(index: Int) {
         this.setAsClicked(gameManager!!.currentPlayer)
-        val t = updateBoardRecursive(index)
-        val v = getViewByCoordinates(t)
+        val newActiveGameBoard = updateBoardRecursive(index)
+        swichActiveGameBoard(newActiveGameBoard)
+
         gameManager!!.changePlayer()
-        if (v is GameBoard) {
-            getRoot().deactivate()
-            if (v.state != BoardState.Empty)
-                v.parent.activate()
-            else
-                v.activate()
-        }
         gameManager!!.addToHistory(this.coordinates)
     }
 
@@ -261,7 +255,7 @@ class GameBoard : GridLayout {
 
     fun undo() {
         if (gameManager!!.hasHistory()) {
-            val lastMove = getLastMove()
+            val lastMove = gameManager!!.getLastCoordinates()
             var lastField = getViewByCoordinates(lastMove) as TicTacToeField
             lastField.setAsNotClicked()
 
@@ -269,7 +263,7 @@ class GameBoard : GridLayout {
             while (!board.isRoot() && board.parent.state != BoardState.Empty)
                 board = board.parent
 
-            board.undoBoardRecursive()
+            board.undoOnBoardRecursive()
 
             gameManager!!.changePlayer()
             gameManager!!.undo()
@@ -278,14 +272,8 @@ class GameBoard : GridLayout {
                 var coordinates = gameManager!!.getLastCoordinates()
                 lastField = getViewByCoordinates(coordinates) as TicTacToeField
                 coordinates = lastField.parent.updateBoardRecursive(coordinates.last())
-                val v = getViewByCoordinates(coordinates)
-                if (v is GameBoard) {
-                    getRoot().deactivate()
-                    if (v.state != BoardState.Empty)
-                        v.parent.activate()
-                    else
-                        v.activate()
-                }
+
+                swichActiveGameBoard(coordinates)
             }
             else {
                 getRoot().activate()
@@ -294,19 +282,25 @@ class GameBoard : GridLayout {
 
     }
 
-    fun undoBoardRecursive() {
+    fun swichActiveGameBoard(coordinates: Array<Int>) {
+        val v = getViewByCoordinates(coordinates) as GameBoard
+        getRoot().deactivate()
+        if (v.state != BoardState.Empty)
+            v.parent.activate()
+        else
+            v.activate()
+    }
+
+    fun undoOnBoardRecursive() {
         state = BoardState.Empty
         if (depth == 0)
             for (field in fields!!)
                 field.undoSetAsWon()
         else
             for (child in children!!)
-                child.undoBoardRecursive()
+                child.undoOnBoardRecursive()
     }
 
-    fun getLastMove() : Array<Int> {
-        return gameManager!!.getLastCoordinates()
-    }
 }
 
 fun View.addGridLayoutUndefinedSpecLayoutParams() {
